@@ -10,9 +10,9 @@ def do_create(request, table, id, name, response):
             response.status = 400
             return {"errors": [{
                       "id_exists": {
-                        "status": 400, # "Bad Request"
+                        "status": "400", # "Bad Request"
                       "title": "id already exists",
-                      "detail": {"name": item['name'], "activities": item['activities']}
+                      "detail": {"name": item['name']}
                       }
                     }]
                 }
