@@ -58,7 +58,7 @@ def delete_id_route(id):
 
     return delete_ops.delete_by_id(table, id, response)
 	
-@delete('/users/</name>')
+@delete('/names/</name>')
 def delete_name_route(name):
     name = string(name)
 
