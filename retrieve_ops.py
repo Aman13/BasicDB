@@ -5,6 +5,7 @@ from boto.dynamodb2.exceptions import ItemNotFound
 
 def retrieve_by_id(table, id, response):
 
+<<<<<<< HEAD
   try:
     item = table.get_item(id=id)
     itemdb = table.scan()
