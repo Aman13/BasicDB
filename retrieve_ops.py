@@ -5,16 +5,19 @@ from boto.dynamodb2.exceptions import ItemNotFound
 def retrieve_by_id(table, id, response):
   try:
     item = table.get_item(id=id)
-    itemdb = table.scan()
+    # itemdb = table.scan()
     response.status = 200
 
-    for i in itemdb:
-
-      activityList = str(i["activities"])
-
-      if activityList == "None":
-        activityList = []
-
+    if item['activities'] == None:
+      return {"data": {
+        "type": "person",
+        "id": id,
+        "name": item['name'],
+        "activities": []
+        }
+      }
+    else:
+      activityList = list(item['activities'])
       return {"data": {
         "type": "person",
         "id": id,
