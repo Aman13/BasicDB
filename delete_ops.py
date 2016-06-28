@@ -44,7 +44,7 @@ def delete_by_name(table, name, response):
 					}
 				}
 	
-	reponse.status = 404 #Not Found
+	response.status = 404 #Not Found
 	return {"errors": [{
 				"not_found": {
 					"name": name
