@@ -53,10 +53,18 @@ def get_id_route(id):
 @delete('/users/<id>')
 def delete_id_route(id):
     id = int(id)
-
+    
     print "Deleting id {0}\n".format(id)
 
     return delete_ops.delete_by_id(table, id, response)
+	
+@delete('/names/<name>')
+def delete_name_route(name):
+    name = str(name)
+    
+    print "Deleting name {0}\n".format(name)
+
+    return delete_ops.delete_by_name(table, name, response)
 
 @put('/users/<id>/activities/<activity>')
 def add_activity_route(id, activity):

@@ -5,8 +5,22 @@
 from boto.dynamodb2.exceptions import ItemNotFound
 
 def delete_by_id(table, id, response):
-    print "Delete by id not yet implemented"
-    response.status = 501
-    return {"errors": [{
-        "delete by id not implemented": {"id": id}
-        }]}
+	try:
+		item = table.get_item(id=id)
+		response.status = 200 #Found
+		itemid = id
+		item.delete()
+		return {"data": {
+					"type": "person",
+					"id": itemid
+				}
+			}
+		
+	except ItemNotFound as inf:
+		response.status = 404 #Not Found
+		return {"errors": [{
+					"not_found": {
+						"id": id
+					}
+				}]
+			}
