@@ -6,6 +6,7 @@ from boto.dynamodb2.items import Item
 from boto.dynamodb2.exceptions import ItemNotFound
 
 def delete_by_id(table, id, response):
+
     try:
         item = table.get_item(id=id)
         response.status = 200 #Found
@@ -51,3 +52,5 @@ def delete_by_name(table, name, response):
                 }
             }]
         }
+
+
