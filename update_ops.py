@@ -42,8 +42,41 @@ def add_activity(table, id, activity, response):
     except ItemNotFound as inf:
         response.status = 404
         return {"errors": [{
-                    "not_found": {
-                        "id" : id
-                        }
-                    }]
+            "not_found": {
+                "id" : id
                 }
+            }]
+        }
+
+def delete_activity(table, id, activity, response):
+    try:
+        item = table.get_item(id=id)
+        difSet = set()
+        difSet.add(str(activity))
+        originalSet = set()
+        for i in item['activities']:
+            originalSet.add(str(i))
+        newSet = originalSet.difference(difSet)
+        if newSet == originalSet:
+            return {"errors": [{
+                "not_found": {
+                    "id" : id
+                    }
+                }]
+            }
+        item['activities'] = newSet
+        item.save()
+        return {"data": {
+            "type": "person",
+            "id": id,
+            "deleted": [str(activity)]
+        }}
+
+    except ItemNotFound as inf:
+        response.status = 404
+        return {"errors": [{
+            "not_found": {
+                "id" : id
+                }
+            }]
+        }

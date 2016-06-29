@@ -54,30 +54,37 @@ def get_id_route(id):
 def get_name_route(name):
     name = str(name) # In URI, id is a string and must be made int
     print "Retrieving name {0}\n".format(name)
-    
+
     return retrieve_ops.retrieve_by_name(table, name, response)
 
 @delete('/users/<id>')
 def delete_id_route(id):
     id = int(id)
-    
+
     print "Deleting id {0}\n".format(id)
 
     return delete_ops.delete_by_id(table, id, response)
-	
+
 @delete('/names/<name>')
 def delete_name_route(name):
     name = str(name)
-    
+
     print "Deleting name {0}\n".format(name)
 
     return delete_ops.delete_by_name(table, name, response)
+
+@delete('/users/<id>/activities/<activity>')
+def delete_activity_route(id, activity):
+    id = int(id)
+    print "deleting activity for id {0}, activity {1}\n".format(id, activity)
+
+    return update_ops.delete_activity(table, id, activity, response)
 
 @put('/users/<id>/activities/<activity>')
 def add_activity_route(id, activity):
     id = int(id)
     print "adding activity for id {0}, activity {1}\n".format(id, activity)
-    
+
     return update_ops.add_activity(table, id, activity, response)
 
 #  You can use the following without modification
@@ -105,4 +112,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
