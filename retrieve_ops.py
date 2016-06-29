@@ -1,6 +1,7 @@
 ''' Retrieve operations for CMPT 474 Assignment 2 '''
 from boto.dynamodb2.items import Item
 from boto.dynamodb2.exceptions import ItemNotFound
+import json
 
 def retrieve_by_id(table, id, response):
   try:
@@ -31,6 +32,21 @@ def retrieve_by_id(table, id, response):
     return {"errors": [{
         "retrieve by id not implemented": {"id": id}
         }]}
+
+def retrieve_by_users(table):
+  p = set()
+  itemdb = table.scan()
+  for i in itemdb:
+      itemid = int(i["id"]) 
+      iname = str(i["name"])
+      obj = type('',(object,),{
+        "name": iname,
+        "id": itemid})()
+      print(obj.name)
+      p.add(obj)
+      #print(json.dumps(p.__dict__))
+  return {"data": [json.dumps(obj.__dict__)]    
+    }
 
 def retrieve_by_name(table, name, response):
 
