@@ -62,7 +62,7 @@ def get_users_route():
    
     print "retrieve_users "
     
-    return retrieve_ops.retrieve_by_users(table)
+    return retrieve_ops.retrieve_by_users(table,response)
 
 @delete('/users/<id>')
 def delete_id_route(id):

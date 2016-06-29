@@ -33,20 +33,19 @@ def retrieve_by_id(table, id, response):
         "retrieve by id not implemented": {"id": id}
         }]}
 
-def retrieve_by_users(table):
-  p = set()
+def retrieve_by_users(table,response):
+
   itemdb = table.scan()
+  response.status = 200
+  p = []
   for i in itemdb:
       itemid = int(i["id"]) 
-      iname = str(i["name"])
-      obj = type('',(object,),{
-        "name": iname,
-        "id": itemid})()
-      print(obj.name)
-      p.add(obj)
-      #print(json.dumps(p.__dict__))
-  return {"data": [json.dumps(obj.__dict__)]    
-    }
+      obj = { 
+        "type": "users",
+        "id": itemid}
+      p.append(obj)
+      #print p
+  return {"data":p}
 
 def retrieve_by_name(table, name, response):
 
