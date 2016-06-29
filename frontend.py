@@ -50,6 +50,13 @@ def get_id_route(id):
 
     return retrieve_ops.retrieve_by_id(table, id, response)
 
+@get('/names/<name>')
+def get_name_route(name):
+    name = str(name) # In URI, id is a string and must be made int
+    print "Retrieving name {0}\n".format(name)
+    
+    return retrieve_ops.retrieve_by_name(table, name, response)
+
 @delete('/users/<id>')
 def delete_id_route(id):
     id = int(id)
