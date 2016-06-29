@@ -20,9 +20,9 @@ def do_create(request, table, id, name, response):
     except ItemNotFound as inf:
         p = Item(table, data={'id': id, 'name': name, 'activities': set()})
         p.save()
-    
+
     response.status = 201 # "Created"
-    
+
     return {"data": {
         "type": "person",
         "id": id,
