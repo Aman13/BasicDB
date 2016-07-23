@@ -1,7 +1,0 @@
-# DO NOT DELETE THIS FILE.  IT IS REQUIRED FOR TESTS TO RUN
-# You are welcome to add Python libraries to install via pip
-# if they are not currently provided.  Do not remove any
-# libraries listed below.
-bottle
-boto
-requests
