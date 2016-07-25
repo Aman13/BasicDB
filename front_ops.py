@@ -4,6 +4,7 @@
 
 # Standard library packages
 import json
+import os
 
 # Installed packages
 import boto.sqs
@@ -11,8 +12,16 @@ import boto.sqs
 # Imports of unqualified names
 from bottle import post, get, put, delete, request, response
 
+import boto.dynamodb2
+import boto.dynamodb2.table
+import boto.sqs
+
 # Local modules
 import SendMsg
+import create_ops
+import retrieve_ops
+import delete_ops
+import update_ops
 
 # Constants
 AWS_REGION = "us-west-2"
@@ -26,6 +35,8 @@ def health_check():
     response.status = 200
     return "Healthy"
 
+a = 0
+
 '''
 # EXTEND:
 # Define all the other REST operations here ...
@@ -33,6 +44,84 @@ def health_check():
 def create_route():
     pass
 '''
+@post('/users')
+def create_route():
+    ct = request.get_header('content-type')
+    if ct != 'application/json':
+        return abort(response, 400, [
+            "request content-type unacceptable:  body must be "
+            "'application/json' (was '{0}')".format(ct)])
+    msg = request.json
+    msg_a = boto.sqs.message.Message()
+    msg_b = boto.sqs.message.Message()
+
+    # msg_a.set_body(msg)
+    # print "msg_a_body"
+    # print msg_a.get_body()
+    # tempA = {'op' : 'write', 'favNumber' : 42, 'name' : 'brad'}
+    # tempB = {'op' : 'write', 'favNumber' : 13, 'name' : 'aman'}
+
+    # temp_json_A = json.dumps(tempA)
+    # temp_json_B = json.dumps(tempB)
+    temp_json_A = json.dumps(msg)
+    temp_json_B = json.dumps(msg)
+    msg_b.set_body(temp_json_B)
+    msg_a.set_body(temp_json_A)
+    result = send_msg_ob.send_msg(msg_a, msg_b)
+
+    # Pass the called routine the response object to construct a response from
+
+@get('/users/<id>')
+def get_id_route(id):
+    id = int(id) # In URI, id is a string and must be made int
+    print "Retrieving id {0}\n".format(id)
+
+    return retrieve_ops.retrieve_by_id(table, id, response)
+
+@get('/names/<name>')
+def get_name_route(name):
+    name = str(name) # In URI, id is a string and must be made int
+    print "Retrieving name {0}\n".format(name)
+
+    return retrieve_ops.retrieve_by_name(table, name, response)
+
+@get('/users')
+def get_users_route():
+   
+    print "retrieve_users "
+    
+    return retrieve_ops.retrieve_by_users(table,response)
+
+@delete('/users/<id>')
+def delete_id_route(id):
+    id = int(id)
+
+    print "Deleting id {0}\n".format(id)
+
+    return delete_ops.delete_by_id(table, id, response)
+
+@delete('/names/<name>')
+def delete_name_route(name):
+    name = str(name)
+
+    print "Deleting name {0}\n".format(name)
+
+    return delete_ops.delete_by_name(table, name, response)
+
+@delete('/users/<id>/activities/<activity>')
+def delete_activity_route(id, activity):
+    id = int(id)
+    print "deleting activity for id {0}, activity {1}\n".format(id, activity)
+
+    return update_ops.delete_activity(table, id, activity, response)
+
+@put('/users/<id>/activities/<activity>')
+def add_activity_route(id, activity):
+    id = int(id)
+    print "adding activity for id {0}, activity {1}\n".format(id, activity)
+
+    return update_ops.add_activity(table, id, activity, response)
+
 
 '''
    Boilerplate: Do not modify the following function. It
@@ -57,17 +146,35 @@ def create_route():
 def set_send_msg(send_msg_ob_p):
     global send_msg_ob
     send_msg_ob = send_msg_ob_p.setup(write_to_queues, set_dup_DS)
-
 '''
    EXTEND:
    Set up the input queues and output queue here
    The output queue reference must be stored in the variable q_out
 '''
 
+try:
+  conn = boto.sqs.connect_to_region(AWS_REGION)
+  if conn == None:
+      sys.stderr.write("Could not connect to AWS region '{0}'\n".format(AWS_REGION))
+      sys.exit(1)
+
+  # create_queue is idempotent---if queue exists, it simply connects to it
+  global a3_in_a
+  global a3_in_b
+  a3_in_a = conn.create_queue(Q_IN_NAME_BASE+"_a")
+  a3_in_b = conn.create_queue(Q_IN_NAME_BASE+"_b")
+  q_out = conn.create_queue(Q_OUT_NAME)
+except Exception as e:
+  sys.stderr.write("Exception connecting to SQS\n")
+  sys.stderr.write(str(e))
+  sys.exit(1)
+
 def write_to_queues(msg_a, msg_b):
     # EXTEND:
     # Send msg_a to a3_in_a and msg-b to a3_in_b
-    pass
+
+    a3_in_a.write(msg_a)
+    a3_in_b.write(msg_b)
 
 '''
    EXTEND:
