@@ -58,11 +58,13 @@ def create_route():
     # msg_a.set_body(msg)
     # print "msg_a_body"
     # print msg_a.get_body()
-    tempA = {'op' : 'write', 'favNumber' : 42, 'name' : 'brad'}
-    tempB = {'op' : 'write', 'favNumber' : 13, 'name' : 'aman'}
+    # tempA = {'op' : 'write', 'favNumber' : 42, 'name' : 'brad'}
+    # tempB = {'op' : 'write', 'favNumber' : 13, 'name' : 'aman'}
 
-    temp_json_A = json.dumps(tempA)
-    temp_json_B = json.dumps(tempB)
+    # temp_json_A = json.dumps(tempA)
+    # temp_json_B = json.dumps(tempB)
+    temp_json_A = json.dumps(msg)
+    temp_json_B = json.dumps(msg)
     msg_b.set_body(temp_json_B)
     msg_a.set_body(temp_json_A)
     result = send_msg_ob.send_msg(msg_a, msg_b)

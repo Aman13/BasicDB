@@ -59,6 +59,10 @@ if __name__ == "__main__":
             * record the message id and response
             * put the response on the output queue
     '''
+
+    conn = open_conn(AWS_REGION)
+    q_in = open_q(Q_IN_NAME_BASE+sys.argv[1], conn)
+
     global table
     try:
         conn = boto.dynamodb2.connect_to_region(AWS_REGION)
@@ -72,10 +76,9 @@ if __name__ == "__main__":
         sys.stderr.write(str(e))
         sys.exit(1)
 
-    conn = open_conn(AWS_REGION)
-    q_in = open_q("a3_back_in_b", conn)
     while True: 
       rs = q_in.get_messages()
-      m = rs[0]
-      print m.get_body()
+      for i in range(len(rs)):
+        m = rs[i]
+        print m.get_body()
         
