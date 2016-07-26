@@ -167,8 +167,6 @@ try:
   # create global message variables
     global msg_a
     global msg_b
-    actions = []
-    responsechecks = []
     msg_a = boto.sqs.message.Message()
     msg_b = boto.sqs.message.Message()
 
@@ -198,7 +196,8 @@ def write_to_queues(msg_a, msg_b):
 '''
 
 # Define any necessary data structures globally here
-
+global actions
+global responsechecks
 actions = []
 responsechecks = []
 
@@ -252,7 +251,7 @@ def mark_first_response(id):
 
 def mark_second_response(id):
     global responsechecks
-	# EXTEND:
+    # EXTEND:
     # Update the data structures to note that the second response has been received
     for i in responsechecks:
         if i['id1'] == id or i['id2'] == id:
@@ -264,10 +263,7 @@ def clear_duplicate_response(id):
     pass
 
 def set_dup_DS(action, sent_a, sent_b):
-    global actions
-	global responsechecks
-	
-	'''
+    '''
        EXTEND:
        Set up the data structures to identify and detect duplicates
        action: The action to perform on receipt of the response.
@@ -280,7 +276,6 @@ def set_dup_DS(action, sent_a, sent_b):
                msg_id attribute of the JSON object returned by the
                response from the backend code that you write.
     '''
-
     dict = {'id1': sent_a.id, 'id2': sent_b.id, 'action': action}
     actions.append(dict)
     dict_2 = {'id1': sent_a.id, 'id2': sent_b.id, 'first_response': False, 'second_response': False,}

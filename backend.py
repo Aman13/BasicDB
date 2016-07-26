@@ -48,6 +48,28 @@ def handle_args():
     argp.add_argument('suffix', help="Suffix for queue base ({0}) and table base ({1})".format(Q_IN_NAME_BASE, TABLE_NAME_BASE))
     return argp.parse_args()
 
+#Global list that holds responses
+global duplicates
+duplicates = []
+
+def is_dupe(id):
+    if duplicates:
+        for i in duplicates:
+    	    if i['id'] == i:
+                return True
+        return False
+    else:
+        return False
+
+def update_list(id, response):
+    dict ={'id': id, 'response': response}
+    duplicates.append(dict)
+
+def return_dupe(id):
+    for i in duplicates:
+	    if i['id'] == i:
+		    return i['response']
+
 if __name__ == "__main__":
     args = handle_args()
     '''
@@ -94,59 +116,69 @@ if __name__ == "__main__":
             json_res = boto.sqs.message.Message()
             print "Message ID: "
             print msg_id
-            #Create
-            if (body['METHOD'] == 'POST' and body['ROUTE'] == 'users'):
-                result = create_ops.do_create(request, table, body['id'], body['name'], response)
-                q_in.delete_message(msg_in)
-                result.update({'msg_id':body['msg_id']})
-                msg_res = json.dumps(result)
-                json_res.set_body(msg_res)
-                print json_res.get_body()
-                q_out.write(json_res)
 
-            #Delete
-            if (body['METHOD'] == 'delete' and body['ROUTE'] == 'users/id'):
-                result = delete_ops.delete_by_id(table, body['id'], response)
-                q_in.delete_message(msg_in)
-                result.update({'msg_id':body['msg_id']})
-                msg_res = json.dumps(result)
-                json_res.set_body(msg_res)
-                print json_res.get_body()
-                q_out.write(json_res)
-            elif (body['METHOD'] == 'delete' and body['ROUTE'] == 'users/name'):
-                result = delete_ops.delete_by_name(table, body['name'], response)
-                q_in.delete_message(msg_in)
-                result.update({'msg_id':body['msg_id']})
-                msg_res = json.dumps(result)
-                json_res.set_body(msg_res)
-                print json_res.get_body()
-                q_out.write(json_res)
+            if is_dupe(msg_id):
+                q_out.write(return_dupe(id))
+            else:
+			    #Create
+                if (body['METHOD'] == 'POST' and body['ROUTE'] == 'users'):
+                    result = create_ops.do_create(request, table, body['id'], body['name'], response)
+                    q_in.delete_message(msg_in)
+                    result.update({'msg_id':body['msg_id']})
+                    msg_res = json.dumps(result)
+                    json_res.set_body(msg_res)
+                    print json_res.get_body()
+                    update_list(msg_id,json_res) #Update duplicates list with new message/response
+                    q_out.write(json_res)
 
-            #Retrieve
-            if (body['METHOD'] == 'GET' and body['ROUTE'] == 'users/id'):
-                result = retrieve_ops.retrieve_by_id(table, body['ID'], response)
-                q_in.delete_message(msg_in)
-                result.update({'msg_id':body['msg_id']})
-                msg_res = json.dumps(result)
-                json_res.set_body(msg_res)
-                print json_res.get_body()
-                q_out.write(json_res)
-            elif (body['METHOD'] == 'GET' and body['ROUTE'] == 'users/names'):
-                result = retrieve_ops.retrieve_by_name(table, body['NAME'], response)
-                q_in.delete_message(msg_in)
-                result.update({'msg_id':body['msg_id']})
-                msg_res = json.dumps(result)
-                json_res.set_body(msg_res)
-                print json_res.get_body()
-                q_out.write(json_res)
-            elif (body['METHOD'] == 'GET' and body['ROUTE'] == 'users'):
-                result = retrieve_ops.retrieve_by_users(table, response)
-                q_in.delete_message(msg_in)
-                result.update({'msg_id':body['msg_id']})
-                msg_res = json.dumps(result)
-                json_res.set_body(msg_res)
-                print json_res.get_body()
-                q_out.write(json_res)
+                #Delete
+                if (body['METHOD'] == 'delete' and body['ROUTE'] == 'users/id'):
+                    result = delete_ops.delete_by_id(table, body['id'], response)
+                    q_in.delete_message(msg_in)
+                    result.update({'msg_id':body['msg_id']})
+                    msg_res = json.dumps(result)
+                    json_res.set_body(msg_res)
+                    print json_res.get_body()
+                    update_list(msg_id,json_res) #Update duplicates list with new message/response
+                    q_out.write(json_res)
+                elif (body['METHOD'] == 'delete' and body['ROUTE'] == 'users/name'):
+                    result = delete_ops.delete_by_name(table, body['name'], response)
+                    q_in.delete_message(msg_in)
+                    result.update({'msg_id':body['msg_id']})
+                    msg_res = json.dumps(result)
+                    json_res.set_body(msg_res)
+                    print json_res.get_body()
+                    update_list(msg_id,json_res) #Update duplicates list with new message/response
+                    q_out.write(json_res)
+
+                #Retrieve
+                if (body['METHOD'] == 'GET' and body['ROUTE'] == 'users/id'):
+                    result = retrieve_ops.retrieve_by_id(table, body['ID'], response)
+                    q_in.delete_message(msg_in)
+                    result.update({'msg_id':body['msg_id']})
+                    msg_res = json.dumps(result)
+                    json_res.set_body(msg_res)
+                    print json_res.get_body()
+                    update_list(msg_id,json_res) #Update duplicates list with new message/response
+                    q_out.write(json_res)
+                elif (body['METHOD'] == 'GET' and body['ROUTE'] == 'users/names'):
+                    result = retrieve_ops.retrieve_by_name(table, body['NAME'], response)
+                    q_in.delete_message(msg_in)
+                    result.update({'msg_id':body['msg_id']})
+                    msg_res = json.dumps(result)
+                    json_res.set_body(msg_res)
+                    print json_res.get_body()
+                    update_list(msg_id,json_res) #Update duplicates list with new message/response
+                    q_out.write(json_res)
+                elif (body['METHOD'] == 'GET' and body['ROUTE'] == 'users'):
+                    result = retrieve_ops.retrieve_by_users(table, response)
+                    q_in.delete_message(msg_in)
+                    result.update({'msg_id':body['msg_id']})
+                    msg_res = json.dumps(result)
+                    json_res.set_body(msg_res)
+                    print json_res.get_body()
+                    update_list(msg_id,json_res) #Update duplicates list with new message/response
+                    q_out.write(json_res)
 
             wait_start = time.time()
         elif time.time() - wait_start > MAX_TIME_S:
