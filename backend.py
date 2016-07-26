@@ -4,6 +4,12 @@
   Back end DB server for Assignment 3, CMPT 474.
 '''
 
+# Local Imports
+import create_ops
+
+# Imports of unqualified names
+from bottle import post, get, put, delete, request, response
+
 # Library packages
 import argparse
 import json
@@ -44,7 +50,7 @@ if __name__ == "__main__":
     args = handle_args()
     '''
        EXTEND:
-       
+
        After the above statement, args.suffix holds the suffix to use
        for the input queue and the DynamoDB table.
 
@@ -62,6 +68,7 @@ if __name__ == "__main__":
 
     conn = open_conn(AWS_REGION)
     q_in = open_q(Q_IN_NAME_BASE+sys.argv[1], conn)
+    q_out = open_q(Q_OUT_NAME, conn)
 
     global table
     try:
@@ -76,9 +83,28 @@ if __name__ == "__main__":
         sys.stderr.write(str(e))
         sys.exit(1)
 
-    while True: 
-      rs = q_in.get_messages()
-      for i in range(len(rs)):
-        m = rs[i]
-        print m.get_body()
-        
+    wait_start = time.time()
+    while True:
+        msg_in = q_in.read(wait_time_seconds=MAX_WAIT_S, visibility_timeout=DEFAULT_VIS_TIMEOUT_S)
+        if msg_in:
+            body = json.loads(msg_in.get_body())
+            msg_id = body['msg_id']
+            print "Message ID: "
+            print msg_id
+            if (body['METHOD'] == 'POST' and body['ROUTE'] == 'users'):
+                result = create_ops.do_create(request, table, body['id'], body['name'], response)
+                q_in.delete_message(msg_in)
+                result.update({'msg_id':body['msg_id']})
+
+                msg_res = json.dumps(result)
+                json_res = boto.sqs.message.Message()
+                json_res.set_body(msg_res)
+                print json_res.get_body()
+                q_out.write(json_res)
+
+            wait_start = time.time()
+        elif time.time() - wait_start > MAX_TIME_S:
+            print "\nNo messages on input queue for {0} seconds. Server no longer reading response queue {1}.".format(MAX_TIME_S, q_out.name)
+            break
+        else:
+            pass

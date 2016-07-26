@@ -119,7 +119,7 @@ def forward_msgs(q_in, q_out, dupfrac, senddup, deldup):
                                visibility_timeout=DEFAULT_VIS_TIMEOUT_S)
             total_q_in_reads += 1
             if msg_in:
-                total_q_in_msgs += 1                
+                total_q_in_msgs += 1
                 msg_out = forward_msg(msg_in,
                                       msgs_to_dup,
                                       dupfrac)

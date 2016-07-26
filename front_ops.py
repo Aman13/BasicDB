@@ -35,8 +35,6 @@ def health_check():
     response.status = 200
     return "Healthy"
 
-a = 0
-
 '''
 # EXTEND:
 # Define all the other REST operations here ...
@@ -52,31 +50,36 @@ def create_route():
             "request content-type unacceptable:  body must be "
             "'application/json' (was '{0}')".format(ct)])
     msg = request.json
-    msg_a = boto.sqs.message.Message()
-    msg_b = boto.sqs.message.Message()
+    print request.urlparts.netloc
+    msg.update({'METHOD':'POST'})
+    msg.update({'ROUTE':'users'})
+    json_body_A = json.dumps(msg)
+    print json_body_A
+    msg_a.set_body(json_body_A)
+    result = send_msg_ob.send_msg(msg_a, msg_a)
+    print "RESULT: "
+    print result
 
-    # msg_a.set_body(msg)
-    # print "msg_a_body"
-    # print msg_a.get_body()
-    # tempA = {'op' : 'write', 'favNumber' : 42, 'name' : 'brad'}
-    # tempB = {'op' : 'write', 'favNumber' : 13, 'name' : 'aman'}
-
-    # temp_json_A = json.dumps(tempA)
-    # temp_json_B = json.dumps(tempB)
-    temp_json_A = json.dumps(msg)
-    temp_json_B = json.dumps(msg)
-    msg_b.set_body(temp_json_B)
-    msg_a.set_body(temp_json_A)
-    result = send_msg_ob.send_msg(msg_a, msg_b)
 
     # Pass the called routine the response object to construct a response from
 
 @get('/users/<id>')
 def get_id_route(id):
-    id = int(id) # In URI, id is a string and must be made int
-    print "Retrieving id {0}\n".format(id)
-
-    return retrieve_ops.retrieve_by_id(table, id, response)
+    ct = request.get_header('content-type')
+    if ct != 'application/json':
+        return abort(response, 400, [
+            "request content-type unacceptable:  body must be "
+            "'application/json' (was '{0}')".format(ct)])
+    msg = request.json
+    print request.urlparts.netloc
+    msg.update({'METHOD':'GET'})
+    msg.update({'ROUTE':'users'})
+    json_body_A = json.dumps(msg)
+    print json_body_A
+    msg_a.set_body(json_body_A)
+    result = send_msg_ob.send_msg(msg_a, msg_a)
+    print "RESULT: "
+    print result
 
 @get('/names/<name>')
 def get_name_route(name):
@@ -87,9 +90,9 @@ def get_name_route(name):
 
 @get('/users')
 def get_users_route():
-   
+
     print "retrieve_users "
-    
+
     return retrieve_ops.retrieve_by_users(table,response)
 
 @delete('/users/<id>')
@@ -136,7 +139,7 @@ def add_activity_route(id, activity):
 
        send_msg_ob.send_msg(msg_a, msg_b)
 
-   where 
+   where
 
        msg_a is the boto.message.Message() you wish to send to a3_in_a.
        msg_b is the boto.message.Message() you wish to send to a3_in_b.
@@ -158,9 +161,16 @@ try:
       sys.stderr.write("Could not connect to AWS region '{0}'\n".format(AWS_REGION))
       sys.exit(1)
 
+  # create global message variables
+  global msg_a
+  global msg_b
+  msg_a = boto.sqs.message.Message()
+  msg_b = boto.sqs.message.Message()
+
   # create_queue is idempotent---if queue exists, it simply connects to it
   global a3_in_a
   global a3_in_b
+  global q_out
   a3_in_a = conn.create_queue(Q_IN_NAME_BASE+"_a")
   a3_in_b = conn.create_queue(Q_IN_NAME_BASE+"_b")
   q_out = conn.create_queue(Q_OUT_NAME)
@@ -227,7 +237,7 @@ def set_dup_DS(action, sent_a, sent_b):
                Opaque data type: Simply save it, do not interpret it.
        sent_a: The boto.sqs.message.Message() that was sent to a3_in_a.
        sent_b: The boto.sqs.message.Message() that was sent to a3_in_b.
-       
+
                The .id field of each of these is the message ID assigned
                by SQS to each message.  These ids will be in the
                msg_id attribute of the JSON object returned by the
