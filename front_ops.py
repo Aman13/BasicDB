@@ -65,35 +65,34 @@ def create_route():
 
 @get('/users/<id>')
 def get_id_route(id):
-    ct = request.get_header('content-type')
-    if ct != 'application/json':
-        return abort(response, 400, [
-            "request content-type unacceptable:  body must be "
-            "'application/json' (was '{0}')".format(ct)])
-    msg = request.json
-    print request.urlparts.netloc
-    msg.update({'METHOD':'GET'})
-    msg.update({'ROUTE':'users'})
-    json_body_A = json.dumps(msg)
-    print json_body_A
-    msg_a.set_body(json_body_A)
+    id = int(id) # In URI, id is a string and must be made int
+    print "Retrieving id {0}\n".format(id)
+
+    msg = {'METHOD' : 'GET', 'ROUTE' : 'users/id', 'ID' : id}
+    json_body = json.dumps(msg)
+    msg_a.set_body(json_body)
     result = send_msg_ob.send_msg(msg_a, msg_a)
-    print "RESULT: "
-    print result
+    return result
 
 @get('/names/<name>')
 def get_name_route(name):
     name = str(name) # In URI, id is a string and must be made int
     print "Retrieving name {0}\n".format(name)
 
-    return retrieve_ops.retrieve_by_name(table, name, response)
+    msg = {'METHOD' : 'GET', 'ROUTE' : 'users/names', 'NAME' : name}
+    json_body = json.dumps(msg)
+    msg_a.set_body(json_body)
+    result = send_msg_ob.send_msg(msg_a, msg_a)
+    return result
 
 @get('/users')
 def get_users_route():
 
-    print "retrieve_users "
-
-    return retrieve_ops.retrieve_by_users(table,response)
+    msg = {'METHOD' : 'GET', 'ROUTE' : 'users'}
+    json_body = json.dumps(msg)
+    msg_a.set_body(json_body)
+    result = send_msg_ob.send_msg(msg_a, msg_a)
+    return result
 
 @delete('/users/<id>')
 def delete_id_route(id):
