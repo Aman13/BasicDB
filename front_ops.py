@@ -159,28 +159,30 @@ def set_send_msg(send_msg_ob_p):
 '''
 
 try:
-  conn = boto.sqs.connect_to_region(AWS_REGION)
-  if conn == None:
-      sys.stderr.write("Could not connect to AWS region '{0}'\n".format(AWS_REGION))
-      sys.exit(1)
+    conn = boto.sqs.connect_to_region(AWS_REGION)
+    if conn == None:
+        sys.stderr.write("Could not connect to AWS region '{0}'\n".format(AWS_REGION))
+        sys.exit(1)
 
   # create global message variables
-  global msg_a
-  global msg_b
-  msg_a = boto.sqs.message.Message()
-  msg_b = boto.sqs.message.Message()
+    global msg_a
+    global msg_b
+    actions = []
+    responsechecks = []
+    msg_a = boto.sqs.message.Message()
+    msg_b = boto.sqs.message.Message()
 
-  # create_queue is idempotent---if queue exists, it simply connects to it
-  global a3_in_a
-  global a3_in_b
-  global q_out
-  a3_in_a = conn.create_queue(Q_IN_NAME_BASE+"_a")
-  a3_in_b = conn.create_queue(Q_IN_NAME_BASE+"_b")
-  q_out = conn.create_queue(Q_OUT_NAME)
+    # create_queue is idempotent---if queue exists, it simply connects to it
+    global a3_in_a
+    global a3_in_b
+    global q_out
+    a3_in_a = conn.create_queue(Q_IN_NAME_BASE+"_a")
+    a3_in_b = conn.create_queue(Q_IN_NAME_BASE+"_b")
+    q_out = conn.create_queue(Q_OUT_NAME)
 except Exception as e:
-  sys.stderr.write("Exception connecting to SQS\n")
-  sys.stderr.write(str(e))
-  sys.exit(1)
+    sys.stderr.write("Exception connecting to SQS\n")
+    sys.stderr.write(str(e))
+    sys.exit(1)
 
 def write_to_queues(msg_a, msg_b):
     # EXTEND:
@@ -197,61 +199,62 @@ def write_to_queues(msg_a, msg_b):
 
 # Define any necessary data structures globally here
 
-global actions = []
-global responsechecks[]
+global actions
+global responsechecks
 
 def is_first_response(id):
     # EXTEND:
     # Return True if this message is the first response to a request
-	for i in responsechecks:
-		if i['id1'] == id or i['id2'] == id:
-			if i['first_response'] == False:
-				return True
-			else:
-				return False
-	return False
+    for i in responsechecks:
+        if i['id1'] == id or i['id2'] == id:
+            if i['first_response'] == False:
+                return True
+            else:
+                return False
+    return False
 
 def is_second_response(id):
     # EXTEND:
     # Return True if this message is the second response to a request
-	for i in responsechecks:
-		if i['id1'] == id or i['id2'] == id:
-			if i['second_response'] == False:
-				return True
-			else:
-				return False
-	return False
+    for i in responsechecks:
+        if i['id1'] == id or i['id2'] == id:
+            if i['second_response'] == False:
+                return True
+            else:
+                return False
+    return False
 
 def get_response_action(id):
     # EXTEND:
     # Return the action for this message
-	for i in actions:
-		if i['id1'] == id or i['id2'] == id:
-			return i['action']
-	#May need a default return statement for the function to compile
-	
+    for i in actions:
+        if i['id1'] == id or i['id2'] == id:
+            return i['action']
+    #May need a default return statement for the function to compile
+
 def get_partner_response(id):
     # EXTEND:
     # Return the id of the partner for this message, if any
     for i in responsechecks:
-		if i['id1'] == id:
-			return i['id2']
-		elif i['id2'] == id
-			return i['id1']
-	return id #default return
+        if i['id1'] == id:
+            return i['id2']
+        elif i['id2'] == id:
+            return i['id1']
+    return id
+
 def mark_first_response(id):
     # EXTEND:
     # Update the data structures to note that the first response has been received
-	for i in responsechecks:
-		if i['id1'] == id or i['id2'] == id:
-			i['first_response'] = True
+    for i in responsechecks:
+        if i['id1'] == id or i['id2'] == id:
+            i['first_response'] = True
 
 def mark_second_response(id):
     # EXTEND:
     # Update the data structures to note that the second response has been received
-	for i in responsechecks:
-		if i['id1'] == id or i['id2'] == id:
-			i['second_response'] = True
+    for i in responsechecks:
+        if i['id1'] == id or i['id2'] == id:
+            i['second_response'] = True
 
 def clear_duplicate_response(id):
     # EXTEND:
@@ -272,9 +275,9 @@ def set_dup_DS(action, sent_a, sent_b):
                msg_id attribute of the JSON object returned by the
                response from the backend code that you write.
     '''
-	
-	dict = {'key': k, 'id1': sent_a.id, 'id2': sent_b.id, 'action': action}
-	actions.append(dict)
-	dict_2 = {'id1': sent_a.id, 'id2': sent_b.id, 'first_response': False, 'second_response': False,}
-	responsechecks.append(dict_2)
+
+    dict = {'id1': sent_a.id, 'id2': sent_b.id, 'action': action}
+    actions.append(dict)
+    dict_2 = {'id1': sent_a.id, 'id2': sent_b.id, 'first_response': False, 'second_response': False,}
+    responsechecks.append(dict_2)
     pass
