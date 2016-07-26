@@ -197,35 +197,61 @@ def write_to_queues(msg_a, msg_b):
 
 # Define any necessary data structures globally here
 
+global actions = []
+global responsechecks[]
+
 def is_first_response(id):
     # EXTEND:
     # Return True if this message is the first response to a request
-    pass
+	for i in responsechecks:
+		if i['id1'] == id or i['id2'] == id:
+			if i['first_response'] == False:
+				return True
+			else:
+				return False
+	return False
 
 def is_second_response(id):
     # EXTEND:
     # Return True if this message is the second response to a request
-    pass
+	for i in responsechecks:
+		if i['id1'] == id or i['id2'] == id:
+			if i['second_response'] == False:
+				return True
+			else:
+				return False
+	return False
 
 def get_response_action(id):
     # EXTEND:
     # Return the action for this message
-    pass
-
+	for i in actions:
+		if i['id1'] == id or i['id2'] == id:
+			return i['action']
+	#May need a default return statement for the function to compile
+	
 def get_partner_response(id):
     # EXTEND:
     # Return the id of the partner for this message, if any
-    pass
-
+    for i in responsechecks:
+		if i['id1'] == id:
+			return i['id2']
+		elif i['id2'] == id
+			return i['id1']
+	return id #default return
 def mark_first_response(id):
     # EXTEND:
     # Update the data structures to note that the first response has been received
-    pass
+	for i in responsechecks:
+		if i['id1'] == id or i['id2'] == id:
+			i['first_response'] = True
 
 def mark_second_response(id):
     # EXTEND:
     # Update the data structures to note that the second response has been received
-    pass
+	for i in responsechecks:
+		if i['id1'] == id or i['id2'] == id:
+			i['second_response'] = True
 
 def clear_duplicate_response(id):
     # EXTEND:
@@ -246,4 +272,9 @@ def set_dup_DS(action, sent_a, sent_b):
                msg_id attribute of the JSON object returned by the
                response from the backend code that you write.
     '''
+	
+	dict = {'key': k, 'id1': sent_a.id, 'id2': sent_b.id, 'action': action}
+	actions.append(dict)
+	dict_2 = {'id1': sent_a.id, 'id2': sent_b.id, 'first_response': False, 'second_response': False,}
+	responsechecks.append(dict_2)
     pass
