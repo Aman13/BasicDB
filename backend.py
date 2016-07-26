@@ -7,6 +7,7 @@
 # Local Imports
 import create_ops
 import retrieve_ops
+import delete_ops
 
 # Imports of unqualified names
 from bottle import post, get, put, delete, request, response
@@ -90,49 +91,62 @@ if __name__ == "__main__":
         if msg_in:
             body = json.loads(msg_in.get_body())
             msg_id = body['msg_id']
+            json_res = boto.sqs.message.Message()
             print "Message ID: "
             print msg_id
+            #Create
             if (body['METHOD'] == 'POST' and body['ROUTE'] == 'users'):
                 result = create_ops.do_create(request, table, body['id'], body['name'], response)
                 q_in.delete_message(msg_in)
                 result.update({'msg_id':body['msg_id']})
-
                 msg_res = json.dumps(result)
-                json_res = boto.sqs.message.Message()
                 json_res.set_body(msg_res)
                 print json_res.get_body()
                 q_out.write(json_res)
+
+            #Delete
+            if (body['METHOD'] == 'delete' and body['ROUTE'] == 'users/id'):
+                result = delete_ops.delete_by_id(table, body['id'], response)
+                q_in.delete_message(msg_in)
+                result.update({'msg_id':body['msg_id']})
+                msg_res = json.dumps(result)
+                json_res.set_body(msg_res)
+                print json_res.get_body()
+                q_out.write(json_res)
+            elif (body['METHOD'] == 'delete' and body['ROUTE'] == 'users/name'):
+                result = delete_ops.delete_by_name(table, body['name'], response)
+                q_in.delete_message(msg_in)
+                result.update({'msg_id':body['msg_id']})
+                msg_res = json.dumps(result)
+                json_res.set_body(msg_res)
+                print json_res.get_body()
+                q_out.write(json_res)
+
+            #Retrieve
             if (body['METHOD'] == 'GET' and body['ROUTE'] == 'users/id'):
                 result = retrieve_ops.retrieve_by_id(table, body['ID'], response)
                 q_in.delete_message(msg_in)
                 result.update({'msg_id':body['msg_id']})
-
                 msg_res = json.dumps(result)
-                json_res = boto.sqs.message.Message()
                 json_res.set_body(msg_res)
                 print json_res.get_body()
                 q_out.write(json_res)
-            if (body['METHOD'] == 'GET' and body['ROUTE'] == 'users/names'):
+            elif (body['METHOD'] == 'GET' and body['ROUTE'] == 'users/names'):
                 result = retrieve_ops.retrieve_by_name(table, body['NAME'], response)
                 q_in.delete_message(msg_in)
                 result.update({'msg_id':body['msg_id']})
-
                 msg_res = json.dumps(result)
-                json_res = boto.sqs.message.Message()
                 json_res.set_body(msg_res)
                 print json_res.get_body()
                 q_out.write(json_res)
-            if (body['METHOD'] == 'GET' and body['ROUTE'] == 'users'):
+            elif (body['METHOD'] == 'GET' and body['ROUTE'] == 'users'):
                 result = retrieve_ops.retrieve_by_users(table, response)
                 q_in.delete_message(msg_in)
                 result.update({'msg_id':body['msg_id']})
-
                 msg_res = json.dumps(result)
-                json_res = boto.sqs.message.Message()
                 json_res.set_body(msg_res)
                 print json_res.get_body()
                 q_out.write(json_res)
-
 
             wait_start = time.time()
         elif time.time() - wait_start > MAX_TIME_S:

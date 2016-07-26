@@ -97,18 +97,22 @@ def get_users_route():
 @delete('/users/<id>')
 def delete_id_route(id):
     id = int(id)
-
     print "Deleting id {0}\n".format(id)
-
-    return delete_ops.delete_by_id(table, id, response)
+    msg = {'METHOD':'delete', 'ROUTE':'users/id', 'id':id}
+    json_body_A = json.dumps(msg)
+    print json_body_A
+    msg_a.set_body(json_body_A)
+    result = send_msg_ob.send_msg(msg_a, msg_a)
 
 @delete('/names/<name>')
 def delete_name_route(name):
     name = str(name)
-
     print "Deleting name {0}\n".format(name)
-
-    return delete_ops.delete_by_name(table, name, response)
+    msg = {'METHOD':'delete', 'ROUTE':'users/name', 'name':name}
+    json_body_A = json.dumps(msg)
+    print json_body_A
+    msg_a.set_body(json_body_A)
+    result = send_msg_ob.send_msg(msg_a, msg_a)
 
 @delete('/users/<id>/activities/<activity>')
 def delete_activity_route(id, activity):
