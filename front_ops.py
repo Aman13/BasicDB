@@ -199,8 +199,8 @@ def write_to_queues(msg_a, msg_b):
 
 # Define any necessary data structures globally here
 
-global actions
-global responsechecks
+actions = []
+responsechecks = []
 
 def is_first_response(id):
     # EXTEND:
@@ -243,14 +243,16 @@ def get_partner_response(id):
     return id
 
 def mark_first_response(id):
-    # EXTEND:
+    global responsechecks
+	# EXTEND:
     # Update the data structures to note that the first response has been received
     for i in responsechecks:
         if i['id1'] == id or i['id2'] == id:
             i['first_response'] = True
 
 def mark_second_response(id):
-    # EXTEND:
+    global responsechecks
+	# EXTEND:
     # Update the data structures to note that the second response has been received
     for i in responsechecks:
         if i['id1'] == id or i['id2'] == id:
@@ -262,7 +264,10 @@ def clear_duplicate_response(id):
     pass
 
 def set_dup_DS(action, sent_a, sent_b):
-    '''
+    global actions
+	global responsechecks
+	
+	'''
        EXTEND:
        Set up the data structures to identify and detect duplicates
        action: The action to perform on receipt of the response.
