@@ -123,7 +123,7 @@ if __name__ == "__main__":
             else:
                 #Create
                 if (body['METHOD'] == 'POST' and body['ROUTE'] == 'users'):
-                    result = create_ops.do_create(request, table, body['id'], body['name'], response)
+                    result = create_ops.do_create(body['clientRequest'], table, body['id'], body['name'], response)
                     q_in.delete_message(msg_in)
                     returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
                     msg_res = json.dumps(returnResponse)

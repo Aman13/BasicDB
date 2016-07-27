@@ -50,9 +50,13 @@ def create_route():
             "request content-type unacceptable:  body must be "
             "'application/json' (was '{0}')".format(ct)])
     msg = request.json
+    print "Request"
     print request.urlparts.netloc
+    clientRequest = {'urlparts': {"netloc": request.urlparts.netloc, "scheme":request.urlparts.scheme}}
+
     msg.update({'METHOD':'POST'})
     msg.update({'ROUTE':'users'})
+    msg.update({'clientRequest':clientRequest})
     json_body_A = json.dumps(msg)
     print json_body_A
     msg_a.set_body(json_body_A)
