@@ -27,7 +27,7 @@ def do_create(request, table, id, name, response):
         "type": "person",
         "id": id,
         "links": {
-            "self": "{0}://{1}/users/{2}".format(request.urlparts.scheme, request.urlparts.netloc, id)
+            "self": "{0}://{1}/users/{2}".format(request['urlparts']['scheme'], request['urlparts']['netloc'], id)
             }
         }
     }

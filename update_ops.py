@@ -54,6 +54,14 @@ def delete_activity(table, id, activity, response):
         difSet = set()
         difSet.add(str(activity))
         originalSet = set()
+        if item['activities'] == None:
+            response.status = 404
+            return {"errors": [{
+                "not_found": {
+                    "id" : id
+                    }
+                }]
+            }
         for i in item['activities']:
             originalSet.add(str(i))
         newSet = originalSet.difference(difSet)
