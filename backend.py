@@ -119,6 +119,7 @@ if __name__ == "__main__":
             print msg_id
 
             if is_dupe(msg_id):
+                q_in.delete_message(msg_in)
                 q_out.write(return_dupe(msg_id))
             else:
                 #Create
