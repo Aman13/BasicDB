@@ -151,6 +151,27 @@ if __name__ == "__main__":
                     update_list(msg_id,json_res) #Update duplicates list with new message/response
                     q_out.write(json_res)
 
+                #Delete_activity
+	            if (body['METHOD'] == 'delete' and body['ROUTE'] == 'activities'):
+	                result = update_ops.delete_activity(table, body['id'], body['activities'] response)
+	                q_in.delete_message(msg_in)
+                    returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
+                    msg_res = json.dumps(returnResponse)
+	                json_res.set_body(msg_res)
+	                print json_res.get_body()
+	                q_out.write(json_res)
+
+	            #Put
+	            if (body['METHOD'] == 'PUT' and body ['ROUTE'] == 'activities'):
+	            	result = update_ops.add_activity( table, body['id'], body['activity'] response)
+	            	q_in.delete_message(msg_in)
+                    returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
+                    msg_res = json.dumps(returnResponse)
+	                json_res.set_body(msg_res)
+	                print json_res.get_body()
+	                q_out.write(json_res)
+
+
                 #Retrieve
                 if (body['METHOD'] == 'GET' and body['ROUTE'] == 'users/id'):
                     result = retrieve_ops.retrieve_by_id(table, body['ID'], response)

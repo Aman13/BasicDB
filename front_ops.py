@@ -120,18 +120,21 @@ def delete_name_route(name):
     return result['result']
 
 @delete('/users/<id>/activities/<activity>')
-def delete_activity_route(id, activity):
+def delete_activity_route(id, activities):
     id = int(id)
-    print "deleting activity for id {0}, activity {1}\n".format(id, activity)
-
-    return update_ops.delete_activity(table, id, activity, response)
+    msg = {'METHOD':'delete', 'ROUTE':'activities', 'id':id, 'activities': activities}
+    json_body_A = json.dumps(msg)
+    msg_a.set_body(json_body_A)
+    result = send_msg_ob.send_msg(msg_a, msg_a)
 
 @put('/users/<id>/activities/<activity>')
-def add_activity_route(id, activity):
+def add_activity_route(id, activities):
     id = int(id)
-    print "adding activity for id {0}, activity {1}\n".format(id, activity)
-
-    return update_ops.add_activity(table, id, activity, response)
+    msg = {'METHOD': 'PUT', 'ROUTE': 'activities', 'id':id, 'activities': activities}
+	json_body_A = json.dumps(msg)
+    msg_a.set_body(json_body_A)
+    result = send_msg_ob.send_msg(msg_a, msg_a)
+ 
 
 
 '''
