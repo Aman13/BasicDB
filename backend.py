@@ -56,7 +56,7 @@ duplicates = []
 def is_dupe(id):
     if duplicates:
         for i in duplicates:
-            if i['id'] == i:
+            if i['id'] == id:
                 return True
         return False
     else:
@@ -68,7 +68,7 @@ def update_list(id, response):
 
 def return_dupe(id):
     for i in duplicates:
-        if i['id'] == i:
+        if i['id'] == id:
             return i['response']
 
 if __name__ == "__main__":
@@ -119,7 +119,7 @@ if __name__ == "__main__":
             print msg_id
 
             if is_dupe(msg_id):
-                q_out.write(return_dupe(id))
+                q_out.write(return_dupe(msg_id))
             else:
                 #Create
                 if (body['METHOD'] == 'POST' and body['ROUTE'] == 'users'):
