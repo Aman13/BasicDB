@@ -83,6 +83,7 @@ def get_name_route(name):
     msg_a.set_body(json_body)
     result = send_msg_ob.send_msg(msg_a, msg_a)
     response.status = result['response']
+    print response.status
     return result['result']
 
 @get('/users')
@@ -120,21 +121,24 @@ def delete_name_route(name):
     return result['result']
 
 @delete('/users/<id>/activities/<activity>')
-def delete_activity_route(id, activities):
+def delete_activity_route(id, activity):
     id = int(id)
-    msg = {'METHOD':'delete', 'ROUTE':'activities', 'id':id, 'activities': activities}
+    msg = {'METHOD':'delete', 'ROUTE':'activity', 'id':id, 'activities': activity}
     json_body_A = json.dumps(msg)
     msg_a.set_body(json_body_A)
     result = send_msg_ob.send_msg(msg_a, msg_a)
+    response.status = result['response']
+    return result['result']
 
 @put('/users/<id>/activities/<activity>')
-def add_activity_route(id, activities):
+def add_activity_route(id, activity):
     id = int(id)
-    msg = {'METHOD': 'PUT', 'ROUTE': 'activities', 'id':id, 'activities': activities}
-	json_body_A = json.dumps(msg)
+    msg = {'METHOD': 'PUT', 'ROUTE': 'activity', 'id':id, 'activities': activity}
+    json_body_A = json.dumps(msg)
     msg_a.set_body(json_body_A)
     result = send_msg_ob.send_msg(msg_a, msg_a)
- 
+    response.status = result['response']
+    return result['result']
 
 
 '''

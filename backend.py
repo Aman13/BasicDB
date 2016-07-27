@@ -8,6 +8,7 @@
 import create_ops
 import retrieve_ops
 import delete_ops
+import update_ops
 
 # Imports of unqualified names
 from bottle import post, get, put, delete, request, response
@@ -152,24 +153,24 @@ if __name__ == "__main__":
                     q_out.write(json_res)
 
                 #Delete_activity
-	            if (body['METHOD'] == 'delete' and body['ROUTE'] == 'activities'):
-	                result = update_ops.delete_activity(table, body['id'], body['activities'] response)
-	                q_in.delete_message(msg_in)
+                if (body['METHOD'] == 'delete' and body['ROUTE'] == 'activity'):
+                    result = update_ops.delete_activity(table, body['id'], body['activities'], response)
+                    q_in.delete_message(msg_in)
                     returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
                     msg_res = json.dumps(returnResponse)
-	                json_res.set_body(msg_res)
-	                print json_res.get_body()
-	                q_out.write(json_res)
+                    json_res.set_body(msg_res)
+                    print json_res.get_body()
+                    q_out.write(json_res)
 
 	            #Put
-	            if (body['METHOD'] == 'PUT' and body ['ROUTE'] == 'activities'):
-	            	result = update_ops.add_activity( table, body['id'], body['activity'] response)
-	            	q_in.delete_message(msg_in)
+                if (body['METHOD'] == 'PUT' and body ['ROUTE'] == 'activity'):
+                    result = update_ops.add_activity( table, body['id'], body['activities'], response)
+                    q_in.delete_message(msg_in)
                     returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
                     msg_res = json.dumps(returnResponse)
-	                json_res.set_body(msg_res)
-	                print json_res.get_body()
-	                q_out.write(json_res)
+                    json_res.set_body(msg_res)
+                    print json_res.get_body()
+                    q_out.write(json_res)
 
 
                 #Retrieve
