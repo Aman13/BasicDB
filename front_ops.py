@@ -57,10 +57,8 @@ def create_route():
     print json_body_A
     msg_a.set_body(json_body_A)
     result = send_msg_ob.send_msg(msg_a, msg_a)
-    print "RESULT: "
-    print result
-
-
+    response.status = result['response']
+    return result['result']
     # Pass the called routine the response object to construct a response from
 
 @get('/users/<id>')
@@ -72,7 +70,8 @@ def get_id_route(id):
     json_body = json.dumps(msg)
     msg_a.set_body(json_body)
     result = send_msg_ob.send_msg(msg_a, msg_a)
-    return result
+    response.status = result['response']
+    return result['result']
 
 @get('/names/<name>')
 def get_name_route(name):
@@ -83,7 +82,8 @@ def get_name_route(name):
     json_body = json.dumps(msg)
     msg_a.set_body(json_body)
     result = send_msg_ob.send_msg(msg_a, msg_a)
-    return result
+    response.status = result['response']
+    return result['result']
 
 @get('/users')
 def get_users_route():
@@ -92,7 +92,8 @@ def get_users_route():
     json_body = json.dumps(msg)
     msg_a.set_body(json_body)
     result = send_msg_ob.send_msg(msg_a, msg_a)
-    return result
+    response.status = result['response']
+    return result['result']
 
 @delete('/users/<id>')
 def delete_id_route(id):
@@ -103,6 +104,8 @@ def delete_id_route(id):
     print json_body_A
     msg_a.set_body(json_body_A)
     result = send_msg_ob.send_msg(msg_a, msg_a)
+    response.status = result['response']
+    return result['result']
 
 @delete('/names/<name>')
 def delete_name_route(name):
@@ -113,6 +116,8 @@ def delete_name_route(name):
     print json_body_A
     msg_a.set_body(json_body_A)
     result = send_msg_ob.send_msg(msg_a, msg_a)
+    response.status = result['response']
+    return result['result']
 
 @delete('/users/<id>/activities/<activity>')
 def delete_activity_route(id, activity):
