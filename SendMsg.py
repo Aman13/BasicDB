@@ -41,8 +41,9 @@ set_dup_DS = None
 class SendMsg(object):
     # Object is created by frontend.py
     # Argument is a gevent.BoundedSemaphore
-    def __init__(self, guard_resps):
+    def __init__(self, guard_resps, zkcl):
         self.guard_resps = guard_resps
+        self.zkcl = zkcl
 
     # Called by front_ops.py to pass in the two functions from that namespace
     def setup(self, write_to_queues_fn, set_dup_DS_fn):
@@ -64,3 +65,7 @@ class SendMsg(object):
             set_dup_DS(ar, msg_a, msg_b)
         # Wait for response to be dequeued by get_responses()
         return ar.get()
+
+    # Return the session's Kazoo client (for ZooKeeper)
+    def get_zkcl(self):
+        return self.zkcl

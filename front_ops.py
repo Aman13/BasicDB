@@ -297,3 +297,13 @@ def set_dup_DS(action, sent_a, sent_b):
     dict_2 = {'id1': sent_a.id, 'id2': sent_b.id, 'first_response': False, 'second_response': False,}
     responsechecks.append(dict_2)
     pass
+
+def setup_op_counter():
+    global seq_num
+    zkcl = send_msg_ob.get_zkcl()
+    if not zkcl.exists('/SeqNum'):
+        zkcl.create('/SeqNum', "0")
+    else:
+        zkcl.set('/SeqNum', "0")
+
+    seq_num = zkcl.Counter('/SeqNum')

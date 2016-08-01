@@ -21,6 +21,7 @@ import gevent.pywsgi
 from gevent import monkey; monkey.patch_all()
 
 # Local modules
+from kazooclientlast import KazooClientLast, kazoocm
 import SendMsg
 # Your code must define the following names
 from front_ops import (clear_duplicate_response,
@@ -29,6 +30,7 @@ from front_ops import (clear_duplicate_response,
                        is_first_response, is_second_response,
                        mark_first_response, mark_second_response,
                        set_send_msg, # Defined in the template code
+                       setup_op_counter,
                        q_out
     )
 
@@ -39,6 +41,8 @@ DEFAULT_PORT = 80
 MAX_TIME_S = 3600 # One hour
 MAX_WAIT_S = 20 # SQS sets max. of 20 s
 DEFAULT_VIS_TIMEOUT_S = 60
+
+ZOOKEEPER_HOST = "127.0.0.1:2181"
 
 def get_responses(q_out):
     '''
@@ -109,14 +113,18 @@ if __name__ == "__main__":
     # Process command-line arguments
     args = parse_args()
 
-    # Set up semaphore to control access to queues and msg data structs
-    guard_resps = gevent.lock.BoundedSemaphore()
-    set_send_msg(SendMsg.SendMsg(guard_resps))
+    # Connect to ZooKeeper
+    with kazoocm(KazooClientLast(hosts=ZOOKEEPER_HOST)) as zk:
 
-    # Start separate thread to read responses and route to correct request thread
-    gevent.spawn(get_responses, q_out)
+        # Set up semaphore to control access to queues and msg data structs
+        guard_resps = gevent.lock.BoundedSemaphore()
+        set_send_msg(SendMsg.SendMsg(guard_resps, zk))
+        setup_op_counter()
 
-    # Here we go!  Start the Web server on the specified IP and port
-    app = bottle.default_app()
-    server = gevent.pywsgi.WSGIServer((args.ip, args.port), app)
-    server.serve_forever()
+        # Start separate thread to read responses and route to correct request thread
+        gevent.spawn(get_responses, q_out)
+
+        # Here we go!  Start the Web server on the specified IP and port
+        app = bottle.default_app()
+        server = gevent.pywsgi.WSGIServer((args.ip, args.port), app)
+        server.serve_forever()
