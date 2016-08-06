@@ -77,18 +77,18 @@ def return_dupe(id):
         if i['id'] == id:
             return i['response']
 
-def check_messages(op_num):
+def check_messages(opnum):
     if stored_messages:
         for i in stored_messages:
-            if i['op_num'] == message_order:
+            if i['opnum'] == message_order:
                 return True
         return False
     else:
         return False
 
-def return_stored_message(op_num):
+def return_stored_message(opnum):
     for i in stored_messages:
-        if i['op_num'] == op_num:
+        if i['opnum'] == opnum:
             return i['message']
         
 if __name__ == "__main__":
@@ -236,7 +236,7 @@ if __name__ == "__main__":
                     update_list(msg_id,json_res) #Update duplicates list with new message/response
                     q_out.write(json_res)    
             else:
-                dict = {'op_num': body['op_num'], 'message': msg_in}
+                dict = {'opnum': body['opnum'], 'message': msg_in}
                 stored_messages.append(dict)
                 q_in.delete_message(msg_in)
 
