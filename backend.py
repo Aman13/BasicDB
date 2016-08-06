@@ -141,6 +141,7 @@ if __name__ == "__main__":
                     returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
                     msg_res = json.dumps(returnResponse)
                     json_res.set_body(msg_res)
+                    print body['opnum']
                     print json_res.get_body()
                     update_list(msg_id,json_res) #Update duplicates list with new message/response
                     q_out.write(json_res)
@@ -150,6 +151,7 @@ if __name__ == "__main__":
                     returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
                     msg_res = json.dumps(returnResponse)
                     json_res.set_body(msg_res)
+                    print body['opnum']
                     print json_res.get_body()
                     update_list(msg_id,json_res) #Update duplicates list with new message/response
                     q_out.write(json_res)
@@ -161,6 +163,7 @@ if __name__ == "__main__":
                     returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
                     msg_res = json.dumps(returnResponse)
                     json_res.set_body(msg_res)
+                    print body['opnum']
                     print json_res.get_body()
                     q_out.write(json_res)
 
@@ -171,6 +174,7 @@ if __name__ == "__main__":
                     returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
                     msg_res = json.dumps(returnResponse)
                     json_res.set_body(msg_res)
+                    print body['opnum']
                     print json_res.get_body()
                     q_out.write(json_res)
 
@@ -182,6 +186,7 @@ if __name__ == "__main__":
                     returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
                     msg_res = json.dumps(returnResponse)
                     json_res.set_body(msg_res)
+                    print body['opnum']
                     print json_res.get_body()
                     update_list(msg_id,json_res) #Update duplicates list with new message/response
                     q_out.write(json_res)
@@ -191,6 +196,7 @@ if __name__ == "__main__":
                     returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
                     msg_res = json.dumps(returnResponse)
                     json_res.set_body(msg_res)
+                    print body['opnum']
                     print json_res.get_body()
                     update_list(msg_id,json_res) #Update duplicates list with new message/response
                     q_out.write(json_res)
@@ -200,6 +206,7 @@ if __name__ == "__main__":
                     returnResponse = {'result':result, 'msg_id':body['msg_id'], 'response':response.status}
                     msg_res = json.dumps(returnResponse)
                     json_res.set_body(msg_res)
+                    print body['opnum']
                     print json_res.get_body()
                     update_list(msg_id,json_res) #Update duplicates list with new message/response
                     q_out.write(json_res)
