@@ -44,19 +44,24 @@ def create_route():
 '''
 @post('/users')
 def create_route():
+    global seq_num
     ct = request.get_header('content-type')
     if ct != 'application/json':
         return abort(response, 400, [
             "request content-type unacceptable:  body must be "
             "'application/json' (was '{0}')".format(ct)])
     msg = request.json
-    print "Request"
-    print request.urlparts.netloc
     clientRequest = {'urlparts': {"netloc": request.urlparts.netloc, "scheme":request.urlparts.scheme}}
+
+    seq_num += 1
+    v_global = seq_num.value
+    print "Printing Seq Number"
+    print v_global
 
     msg.update({'METHOD':'POST'})
     msg.update({'ROUTE':'users'})
     msg.update({'clientRequest':clientRequest})
+    msg.update({'opnum': v_global})
     json_body_A = json.dumps(msg)
     print json_body_A
     msg_a.set_body(json_body_A)
@@ -67,10 +72,17 @@ def create_route():
 
 @get('/users/<id>')
 def get_id_route(id):
+    global seq_num
     id = int(id) # In URI, id is a string and must be made int
     print "Retrieving id {0}\n".format(id)
 
+    seq_num += 1
+    v_global = seq_num.value
+    print "Printing Seq Number"
+    print v_global
+
     msg = {'METHOD' : 'GET', 'ROUTE' : 'users/id', 'ID' : id}
+    msg.update({'opnum': v_global})
     json_body = json.dumps(msg)
     msg_a.set_body(json_body)
     result = send_msg_ob.send_msg(msg_a, msg_a)
@@ -79,10 +91,17 @@ def get_id_route(id):
 
 @get('/names/<name>')
 def get_name_route(name):
+    global seq_num
     name = str(name) # In URI, id is a string and must be made int
     print "Retrieving name {0}\n".format(name)
 
+    seq_num += 1
+    v_global = seq_num.value
+    print "Printing Seq Number"
+    print v_global
+
     msg = {'METHOD' : 'GET', 'ROUTE' : 'users/names', 'NAME' : name}
+    msg.update({'opnum': v_global})
     json_body = json.dumps(msg)
     msg_a.set_body(json_body)
     result = send_msg_ob.send_msg(msg_a, msg_a)
@@ -92,8 +111,15 @@ def get_name_route(name):
 
 @get('/users')
 def get_users_route():
+    global seq_num
+
+    seq_num += 1
+    v_global = seq_num.value
+    print "Printing Seq Number"
+    print v_global
 
     msg = {'METHOD' : 'GET', 'ROUTE' : 'users'}
+    msg.update({'opnum': v_global})
     json_body = json.dumps(msg)
     msg_a.set_body(json_body)
     result = send_msg_ob.send_msg(msg_a, msg_a)
@@ -102,9 +128,17 @@ def get_users_route():
 
 @delete('/users/<id>')
 def delete_id_route(id):
+    global seq_num
     id = int(id)
     print "Deleting id {0}\n".format(id)
+
+    seq_num += 1
+    v_global = seq_num.value
+    print "Printing Seq Number"
+    print v_global
+
     msg = {'METHOD':'delete', 'ROUTE':'users/id', 'id':id}
+    msg.update({'opnum': v_global})
     json_body_A = json.dumps(msg)
     print json_body_A
     msg_a.set_body(json_body_A)
@@ -114,9 +148,17 @@ def delete_id_route(id):
 
 @delete('/names/<name>')
 def delete_name_route(name):
+    global seq_num
     name = str(name)
     print "Deleting name {0}\n".format(name)
+
+    seq_num += 1
+    v_global = seq_num.value
+    print "Printing Seq Number"
+    print v_global
+
     msg = {'METHOD':'delete', 'ROUTE':'users/name', 'name':name}
+    msg.update({'opnum': v_global})
     json_body_A = json.dumps(msg)
     print json_body_A
     msg_a.set_body(json_body_A)
@@ -126,8 +168,16 @@ def delete_name_route(name):
 
 @delete('/users/<id>/activities/<activity>')
 def delete_activity_route(id, activity):
+    global seq_num
     id = int(id)
+
+    seq_num += 1
+    v_global = seq_num.value
+    print "Printing Seq Number"
+    print v_global
+
     msg = {'METHOD':'delete', 'ROUTE':'activity', 'id':id, 'activities': activity}
+    msg.update({'opnum': v_global})
     json_body_A = json.dumps(msg)
     msg_a.set_body(json_body_A)
     result = send_msg_ob.send_msg(msg_a, msg_a)
@@ -136,8 +186,16 @@ def delete_activity_route(id, activity):
 
 @put('/users/<id>/activities/<activity>')
 def add_activity_route(id, activity):
+    global seq_num
     id = int(id)
+
+    seq_num += 1
+    v_global = seq_num.value
+    print "Printing Seq Number"
+    print v_global
+
     msg = {'METHOD': 'PUT', 'ROUTE': 'activity', 'id':id, 'activities': activity}
+    msg.update({'opnum': v_global})
     json_body_A = json.dumps(msg)
     msg_a.set_body(json_body_A)
     result = send_msg_ob.send_msg(msg_a, msg_a)
