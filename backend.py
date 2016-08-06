@@ -80,7 +80,7 @@ def return_dupe(id):
 def check_messages(op_num):
     if stored_messages:
         for i in stored_messages:
-            if i['op_num'] == op_num:
+            if i['op_num'] == message_order:
                 return True
         return False
     else:
@@ -90,7 +90,7 @@ def return_stored_message(op_num):
     for i in stored_messages:
         if i['op_num'] == op_num:
             return i['message']
-		
+        
 if __name__ == "__main__":
     args = handle_args()
     '''
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     wait_start = time.time()
     while True:
         if(check_messages(message_order)):
-		    msg_in = return_stored_message(message_order)
+            msg_in = return_stored_message(message_order)
         else:
             msg_in = q_in.read(wait_time_seconds=MAX_WAIT_S, visibility_timeout=DEFAULT_VIS_TIMEOUT_S)
 
@@ -192,7 +192,7 @@ if __name__ == "__main__":
                     print json_res.get_body()
                     q_out.write(json_res)
 
-	            #Put
+                #Put
                 if (body['METHOD'] == 'PUT' and body ['ROUTE'] == 'activity'):
                     result = update_ops.add_activity( table, body['id'], body['activities'], response)
                     q_in.delete_message(msg_in)
