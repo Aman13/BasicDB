@@ -52,6 +52,8 @@ def handle_args():
 #Global list that holds responses
 global duplicates
 duplicates = []
+global message_order
+message_order = 1;
 
 def is_dupe(id):
     if duplicates:
@@ -121,7 +123,8 @@ if __name__ == "__main__":
             if is_dupe(msg_id):
                 q_in.delete_message(msg_in)
                 q_out.write(return_dupe(msg_id))
-            else:
+            elif (body['opnum'] == message_order):
+                message_order += 1
                 #Create
                 if (body['METHOD'] == 'POST' and body['ROUTE'] == 'users'):
                     result = create_ops.do_create(body['clientRequest'], table, body['id'], body['name'], response)
