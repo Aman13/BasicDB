@@ -21,7 +21,8 @@ import boto.sqs
 # Constants
 AWS_REGION = "us-west-2"
 MAX_TIME_S = 3600 # One hour
-MAX_WAIT_S = 20 # SQS sets max. of 20 s
+DEFAULT_SQS_WAIT = 20
+SQS_MAX_TIMEOUT = 20 # Maximum permitted by SQS
 DEFAULT_VIS_TIMEOUT_S = 60
 SEND_DUP_FRAC = 20 # % of times that a msg will be selected from a non-empty duplicate list
 SEND_DUP_MIN = 10 # Min value of SEND_DUP_FRAC---0 would imply messages are never in fact duplicated
@@ -53,6 +54,12 @@ def handle_args():
     argp.add_argument('--deldup', type=int, default=DEL_DUP_FRAC,
                       help="Percent of times that a duplicated msg will be "
                       "deleted from the duplicate list (integer, default {0}, min {1})".format(DEL_DUP_FRAC, DEL_DUP_MIN))
+    argp.add_argument('--sqs_wait', type=int, default=DEFAULT_SQS_WAIT,
+                      help="Timeout for SQS reads in seconds "
+                      "(integer, default {0}). 0 <= "
+                      "sqs_wait <= {1}. Smaller values will speed up system "
+                      "but increase the number of SQS "
+                      "reads.".format(DEFAULT_SQS_WAIT, SQS_MAX_TIMEOUT))
     args = argp.parse_args()
     if not (0 <= args.dupfrac <= 100):
         print "dupfrac must be >=0 and <= 100"
@@ -64,6 +71,10 @@ def handle_args():
 
     if not (DEL_DUP_MIN <= args.deldup <= 100):
         print "deldup must be >={0} and <= 100".format(DEL_DUP_MIN)
+        sys.exit(1)
+
+    if args.sqs_wait < 0 or SQS_MAX_TIMEOUT < args.sqs_wait:
+        print "sqs_wait must be >= 0 and <= {0}".format(SQS_MAX_TIMEOUT)
         sys.exit(1)
 
     return args
@@ -128,7 +139,7 @@ def forward_msg(msg_in,
             msg_out = REORDERED
     return msg_out
 
-def forward_msgs(q_in, q_out, dupfrac, senddup, deldup):
+def forward_msgs(q_in, q_out, dupfrac, senddup, deldup, sqs_wait):
     total_q_in_reads = 0
     total_q_in_msgs = 0
     total_ignored = 0
@@ -146,7 +157,7 @@ def forward_msgs(q_in, q_out, dupfrac, senddup, deldup):
             wait_start, total_writes = send_msg(q_out, msg_out, total_writes)
             empty_reads = 0
         else:
-            msg_in = q_in.read(wait_time_seconds=MAX_WAIT_S,
+            msg_in = q_in.read(wait_time_seconds=sqs_wait,
                                visibility_timeout=DEFAULT_VIS_TIMEOUT_S)
             total_q_in_reads += 1
             if msg_in:
@@ -183,4 +194,9 @@ if __name__ == "__main__":
     q_in = open_q(args.inqueue, conn)
     q_out = open_q(args.outqueue, conn)
 
-    forward_msgs(q_in, q_out, args.dupfrac, args.senddup, args.deldup)
+    forward_msgs(q_in,
+                 q_out,
+                 args.dupfrac,
+                 args.senddup,
+                 args.deldup,
+                 args.sqs_wait)
