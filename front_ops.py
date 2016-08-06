@@ -44,19 +44,24 @@ def create_route():
 '''
 @post('/users')
 def create_route():
+    global seq_num
     ct = request.get_header('content-type')
     if ct != 'application/json':
         return abort(response, 400, [
             "request content-type unacceptable:  body must be "
             "'application/json' (was '{0}')".format(ct)])
     msg = request.json
-    print "Request"
-    print request.urlparts.netloc
     clientRequest = {'urlparts': {"netloc": request.urlparts.netloc, "scheme":request.urlparts.scheme}}
+
+    seq_num += 1
+    v_global = seq_num.value
+    print "Printing Seq Number"
+    print v_global
 
     msg.update({'METHOD':'POST'})
     msg.update({'ROUTE':'users'})
     msg.update({'clientRequest':clientRequest})
+    msg.update({'opnum': v_global})
     json_body_A = json.dumps(msg)
     print json_body_A
     msg_a.set_body(json_body_A)
