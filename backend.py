@@ -52,8 +52,12 @@ def handle_args():
 #Global list that holds responses
 global duplicates
 duplicates = []
+#Global message number tracker
 global message_order
 message_order = 1;
+#Global list that holds out of order messages
+global stored_messages
+stored_messages = []
 
 def is_dupe(id):
     if duplicates:
@@ -73,6 +77,20 @@ def return_dupe(id):
         if i['id'] == id:
             return i['response']
 
+def check_messages(op_num):
+    if stored_messages:
+        for i in stored_messages:
+            if i['op_num'] == op_num:
+                return True
+        return False
+    else:
+        return False
+
+def return_stored_message(op_num):
+    for i in stored_messages:
+        if i['op_num'] == op_num:
+            return i['message']
+		
 if __name__ == "__main__":
     args = handle_args()
     '''
@@ -112,7 +130,11 @@ if __name__ == "__main__":
 
     wait_start = time.time()
     while True:
-        msg_in = q_in.read(wait_time_seconds=MAX_WAIT_S, visibility_timeout=DEFAULT_VIS_TIMEOUT_S)
+        if(check_messages(message_order)):
+		    msg_in = return_stored_message(message_order)
+        else:
+            msg_in = q_in.read(wait_time_seconds=MAX_WAIT_S, visibility_timeout=DEFAULT_VIS_TIMEOUT_S)
+
         if msg_in:
             body = json.loads(msg_in.get_body())
             msg_id = body['msg_id']
@@ -212,7 +234,11 @@ if __name__ == "__main__":
                     print body['opnum']
                     print json_res.get_body()
                     update_list(msg_id,json_res) #Update duplicates list with new message/response
-                    q_out.write(json_res)
+                    q_out.write(json_res)    
+            else:
+                dict = {'op_num': body['op_num'], 'message': msg_in}
+                stored_messages.append(dict)
+                q_in.delete_message(msg_in)
 
             wait_start = time.time()
         elif time.time() - wait_start > MAX_TIME_S:
